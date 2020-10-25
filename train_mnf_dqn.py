@@ -59,7 +59,7 @@ CONFIG_MOUNTAINCAR = {
     "save": False,  # saves a npz-file with the data of the runs
 }
 
-config = CONFIG_MOUNTAINCAR  # switch between cart pole and mountain car
+config = CONFIG_CARTPOLE  # switch between cart pole and mountain car
 
 config_static = {
     "learning_rate": tf.keras.optimizers.schedules.PolynomialDecay(config["learning_rate_init"],
@@ -70,7 +70,7 @@ config_static = {
 # Setup environment 
 env = gym.make(config["env_name"]).env  # remove 200 step limit
 
-if config["skip_frame_num"] > 0:  # needed for mountain car env, e.g. makes training easier
+if config["skip_frame_num"] > 0:    # optional: skip frames to ease training in MountainCar
     env = WrapFrameSkip(env, frameskip=config["skip_frame_num"])
     
 num_states = len(env.observation_space.sample())
