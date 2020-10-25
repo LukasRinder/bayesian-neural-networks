@@ -2,13 +2,13 @@ import gym
 import tensorflow as tf
 
 from envs.env_utils import WrapFrameSkip
-from dqn.Bayes_by_Backprop_DQN import BBBDQN
+from dqn.MNF_DQN import MNFDQN
 from dqn.train import train_dqn
 
 # config cart pole
 CONFIG_CARTPOLE = {
     "env_name": "CartPole-v1",
-    "algorithm": "bayes_by_backprop",
+    "algorithm": "mnf",
     "seed": [210, 142, 531, 461, 314],
     "runs": 1,  # perform e.g. 5 runs
     "env_render": True,
@@ -35,7 +35,7 @@ CONFIG_CARTPOLE = {
 # config mountain car
 CONFIG_MOUNTAINCAR = {
     "env_name": "MountainCar-v0",
-    "algorithm": "bayes_by_backprop",
+    "algorithm": "mnf",
     "seed": [210, 142, 531, 461, 314],
     "runs": 1,  # perform e.g. 5 runs
     "env_render": True,
@@ -59,7 +59,7 @@ CONFIG_MOUNTAINCAR = {
     "save": False,  # saves a npz-file with the data of the runs
 }
 
-config = CONFIG_CARTPOLE  # switch between cart pole and mountain car
+config = CONFIG_MOUNTAINCAR  # switch between cart pole and mountain car
 
 config_static = {
     "learning_rate": tf.keras.optimizers.schedules.PolynomialDecay(config["learning_rate_init"],
@@ -70,7 +70,7 @@ config_static = {
 # Setup environment 
 env = gym.make(config["env_name"]).env  # remove 200 step limit
 
-if config["skip_frame_num"] > 0:  # optional: skip frames to ease training in MontainCar
+if config["skip_frame_num"] > 0:  # needed for mountain car env, e.g. makes training easier
     env = WrapFrameSkip(env, frameskip=config["skip_frame_num"])
     
 num_states = len(env.observation_space.sample())
@@ -88,9 +88,11 @@ for run_id in (range(config["runs"])):
     tf.random.set_seed(config["seed"][run_id])
 
     # initialize train (action-value function) and target network (target action-value function)
-    train_net = BBBDQN(num_states, num_actions, hidden_units, config["gradient_update_gamma"], config["experiences_max"],
-                       config["experiences_min"], config["batch_size"], config_static["learning_rate"], config["alpha"])
-    target_net = BBBDQN(num_states, num_actions, hidden_units, config["gradient_update_gamma"], config["experiences_max"],
-                        config["experiences_min"], config["batch_size"], config_static["learning_rate"], config["alpha"])
+    train_net = MNFDQN(num_states, num_actions, hidden_units, config["gradient_update_gamma"],
+                       config["experiences_max"], config["experiences_min"], config["batch_size"],
+                       config_static["learning_rate"], config["alpha"])
+    target_net = MNFDQN(num_states, num_actions, hidden_units, config["gradient_update_gamma"],
+                        config["experiences_max"], config["experiences_min"], config["batch_size"],
+                        config_static["learning_rate"], config["alpha"])
 
     train_dqn(config, env, train_net, target_net, run_id)
