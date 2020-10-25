@@ -8,8 +8,18 @@ from bayes.Bayes_by_Backprop import BayesByBackprop
 
 tfkl = tf.keras.layers
 
+TOY_DATA = "toy"
+IAN_DATA = "ian"
+SAMPLE_DATA = "sample"
+ALLOWED_DATA_CONFIGS = {TOY_DATA, IAN_DATA, SAMPLE_DATA}
 
-class MLP(tf.keras.Model):
+MNF = "mnf"
+BAYES_BY_BACKPROP = "bayesbybackprop"
+DENSE = "dense"
+ALLOWED_NETWORK_CONFIGS = {MNF, BAYES_BY_BACKPROP, DENSE}
+
+
+class MLP(tf.Module):
     """
     Simple Multi-layer Perceptron Model.
     """
@@ -20,7 +30,8 @@ class MLP(tf.keras.Model):
         self.hidden_layer_2 = tfkl.Dense(100, activation='relu')
         self.output_layer = tfkl.Dense(1, activation='linear')
 
-    def call(self, x):
+    @tf.function
+    def __call__(self, x, *args, **kwargs):
         y = self.input_layer(x)
         y = self.hidden_layer_1(y)
         y = self.hidden_layer_2(y)
@@ -48,7 +59,7 @@ class BNN_MNF(tf.Module):
         self.dense_mnf_out = DenseMNF(n_out=output_dim, use_z=use_z, max_std=max_std)
 
     @tf.function
-    def __call__(self, inputs, same_noise=False, training=True):
+    def __call__(self, inputs, same_noise=False, training=True, *args, **kwargs):
         out = self.input_layer(inputs)
         for layer in self.hidden_layers:
             if self.hidden_bayes:
@@ -79,7 +90,7 @@ class BNN_MNF(tf.Module):
         self.dense_mnf_out.reset_noise()
 
 
-class BNN_BBB(tf.keras.Model):
+class BNN_BBB(tf.Module):
     """
     Bayesian Neural Network with fully-connected layers utilizing Bayes by Backprop by Blundell et al. (2015).
     """
@@ -97,7 +108,7 @@ class BNN_BBB(tf.keras.Model):
         self.dense_bbb_out = BayesByBackprop(n_out=output_dim, max_std=max_std)
 
     @tf.function
-    def call(self, inputs, same_noise=False, training=True):
+    def __call__(self, inputs, same_noise=False, training=True, *args, **kwargs):
         out = self.input_layer(inputs)
         for layer in self.hidden_layers:
             if self.hidden_bayes:
@@ -145,41 +156,42 @@ def loss_fn(y_train, x_train, model, bayes, reg=1.0, same_noise=False):
     return mse + kl_loss, kl_loss
 
 
-def fit_regression(network, hidden_bayes=False, same_noise=False, max_std=0.5, data="ian",
-                   save=False):
+def fit_regression(network, hidden_bayes=False, same_noise=False, max_std=0.5, data="ian", save=False):
 
-    if data == "toy":
+    # load data
+    if data not in ALLOWED_DATA_CONFIGS:
+        raise AssertionError(f"'data' has to be in {ALLOWED_DATA_CONFIGS} but was set to {data}.")
+    elif data == TOY_DATA:
         data = np.load("data/train_data_regression.npz")
         x_train = data["x_train"]
         y_train = data["y_train"]
         x_lim, y_lim = 4.5, 70.0
         reg = 10.0  # regularization parameter lambda
-    elif data == "ian":
+    elif data == IAN_DATA:
         data = np.load("data/train_data_ian_regression.npz", allow_pickle=True)
         x_train = data["x_train"]
         y_train = data["y_train"]
         x_lim, y_lim = 12.0, 8.0
         reg = 30  # regularization parameter lambda
-    elif data == "sample":
-        batch_size = 20
+    elif data == SAMPLE_DATA:
+        n_samples = 20
         toy_regression = ToyRegressionData()
-        x_train, y_train = toy_regression.gen_data(batch_size)
+        x_train, y_train = toy_regression.gen_data(n_samples)
         x_lim, y_lim = 4.5, 70.0
         reg = 10.0  # regularization parameter lambda
-    else:
-        assert "data has to be either `toy`, `ian`, or `sample`"
 
-    if network == "mnf":
+    # choose network
+    if network not in ALLOWED_NETWORK_CONFIGS:
+        raise AssertionError(f"'network' has to be in {ALLOWED_NETWORK_CONFIGS} but was set to {network}.")
+    elif network == MNF:
         model = BNN_MNF(hidden_bayes=hidden_bayes, max_std=max_std)
         bayes = True
-    elif network == "bayesbybackprop":
+    elif network == BAYES_BY_BACKPROP:
         model = BNN_BBB(hidden_bayes=hidden_bayes, max_std=max_std)
         bayes = True
-    elif network == "mlp":
+    elif network == DENSE:
         model = MLP()
         bayes = False
-    else:
-        assert "network has to be either `mnf`, `bayesbybackprop`, or `mlp`"
 
     epochs = 500
     learning_rate_fn = tf.keras.optimizers.schedules.PolynomialDecay(1e-2, epochs, 1e-6, power=0.5)
@@ -208,7 +220,6 @@ def fit_regression(network, hidden_bayes=False, same_noise=False, max_std=0.5, d
 
     plt.plot(range(epochs), train_losses)
     plt.plot(range(epochs), kl_losses)
-    plt.ylim(0, 1000)
     plt.legend(["Train loss", "KL loss"])
 
     n_test = 500
@@ -258,11 +269,11 @@ if __name__ == '__main__':
     print(f"GPU available: {tf.test.is_gpu_available()}")
 
     # set configuration
-    network = "mnf"  # choose from: "mnf", "bayesbybackprop", "mlp"
-    hidden_bayes = False  # False: last layer MNF, True: all layers MNF
-    same_noise = False  # set if same noise/epsilon should be used within a batch
+    network = MNF  # choose from ALLOWED_NETWORK_CONFIGS
+    hidden_bayes = False  # False: last layer bayes, True: all layers bayes
+    same_noise = True  # set if same noise/epsilon should be used within a batch
     max_std = 0.5
-    data = "ian"  # choose from: "toy", "ian", or "sample"
+    data = IAN_DATA  # choose from ALLOWED_DATA_CONFIGS
     save = False  # save images
 
     fit_regression(network=network, hidden_bayes=hidden_bayes, same_noise=same_noise, max_std=max_std, data=data,
