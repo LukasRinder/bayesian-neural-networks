@@ -150,7 +150,7 @@ class BBBDQN(tf.Module):
     def get_action(self, states, same_noise=False, training=True):
         """
         Predict action with the Bayes By Backprop network. In each forward pass the weights are sampled from the weight
-        posterior distribution. Hence, approximated Thomson sampling is performed. For uncertain weight posterior
+        posterior distribution. Hence, approximated Thompson sampling is performed. For uncertain weight posterior
         distributions the variance in the sampled values will be higher, leading inherently to more exploration.
 
         :param states: observed states, e.g. [x, dx, th, dth].
