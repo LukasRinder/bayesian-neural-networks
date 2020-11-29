@@ -1,7 +1,7 @@
 # Uncertainty Estimation in the Context of Efficient Exploration
 
 This repository investigates recent variational Bayesian inference approaches for uncertainty estimation. The approaches
-are evaluated and visualized on simple regression tasks. Furthermore, the uncertainty estimates from the variational 
+are evaluated and visualized on regression tasks. Furthermore, the uncertainty estimates from the variational 
 Bayesian neural networks are used to perform approximate Thompson sampling within a deep Q-network (DQN) for efficient 
 exploration. The approaches are compared against each other and against the well known epsilon-greedy strategy.
 
@@ -12,7 +12,7 @@ Currently, following variational Bayesian neural networks are implemented:
 - Dropout as a Bayesian Approximation [3]
 - Concrete Dropout [4]
 
-Touati et al. [5] describe how to augment DQNs with multiplicative normalizing flows for an efficient 
+Touati et al. [5] describe how to augment DQNs with multiplicative normalizing flows for a efficient 
 exploration-exploitation strategy.
 
 The repository is structured in the following way:
@@ -22,14 +22,14 @@ dropout utilizes the standard Tensorflow dropout layer.
 - [dqn](/dqn) includes the DQN implementations utilizing the respective variational Bayesian neural networks.
 - [envs](/envs) includes an implementation of a N-chain gym environment and environment utility functions.
 - [normalizingflows](/normalizingflows) contains normalizing flows for the use in Multiplicative Normalizing Flows.
-- [plots](/plots) contains some example visualizations.
+- [plots](/plots) contains example visualizations.
 
 Training functions are located at the root of the repository.
 
-Below we show some example uncertainty estimates on the regression task mentioned in [6]. Additionally, we show the
-average accumulated reward over 5 runs on the OpenAi gym envionments CartPole and MountainCar.
+Below we show example uncertainty estimates on the regression task mentioned in [6]. Additionally, we show the
+average accumulated reward over 5 runs on the OpenAi Gym envionments CartPole and MountainCar.
 
-- Aleatoric (data) uncertainty vs. epistemic (knowledge) uncertainty predicted by MC Dropout with two network heads:
+- Aleatoric (data) uncertainty and epistemic (knowledge) uncertainty predicted by MC Dropout with two network heads:
 
 <img src="plots/MCDropout_heteroscedastic.png" width="500" height="200" />
 
@@ -44,12 +44,12 @@ average accumulated reward over 5 runs on the OpenAi gym envionments CartPole an
 <img src="plots/MNF_last_layers.png" width="500" height="200" />
 
 
-- Average accumulated reward over 5 runs on the OpenAI gym CartPole task:
+- Average accumulated reward over 5 runs on the OpenAI Gym CartPole task:
 
 <img src="plots/avg_acc_reward_cartpole.png" width="500" height="200" />
 
 
-- Average accumulated reward over 5 runs on the OpenAI gym MountainCar task:
+- Average accumulated reward over 5 runs on the OpenAI Gym MountainCar task:
 
 <img src="plots/avg_acc_reward_mountaincar.png" width="500" height="200" />
 
