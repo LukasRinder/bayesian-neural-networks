@@ -1,4 +1,4 @@
-# Normalizing Flows
+# Uncertainty Estimation in the Context of Efficient Exploration
 
 This repository investigates recent variational Bayesian inference approaches for uncertainty estimation. The approaches
 are evaluated and visualized on simple regression tasks. Furthermore, the uncertainty estimates from the variational 
