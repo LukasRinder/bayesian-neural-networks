@@ -31,27 +31,27 @@ average accumulated reward over 5 runs on the OpenAi gym envionments CartPole an
 
 - Aleatoric (data) uncertainty vs. epistemic (knowledge) uncertainty predicted by MC Dropout with two network heads:
 
-<img src="plots/MCDropout_heteroscedastic.pdf" width="500" height="200" />
+<img src="plots/MCDropout_heteroscedastic.png" width="500" height="200" />
 
 
 - Network utilizing 3 MNF dense layers:
 
-<img src="plots/MNF_all_layers.pdf" width="500" height="200" />
+<img src="plots/MNF_all_layers.png" width="500" height="200" />
 
 
 - Network utilizing 2 regular dense layers and 1 MNF dense layers:
 
-<img src="plots/MNF_last_layers.pdf" width="500" height="200" />
+<img src="plots/MNF_last_layers.png" width="500" height="200" />
 
 
 - Average accumulated reward over 5 runs on the OpenAI gym CartPole task:
 
-<img src="plots/avg_acc_reward_cartpole.pdf" width="500" height="200" />
+<img src="plots/avg_acc_reward_cartpole.png" width="500" height="200" />
 
 
 - Average accumulated reward over 5 runs on the OpenAI gym MountainCar task:
 
-<img src="plots/avg_acc_reward_mountaincar.pdf" width="500" height="200" />
+<img src="plots/avg_acc_reward_mountaincar.png" width="500" height="200" />
 
 
 This work was done during the Advanced Deep Learning for Robotics course at TUM in cooperation with the German Aerospace 
