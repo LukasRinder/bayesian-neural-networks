@@ -11,11 +11,6 @@ IAN_DATA = "ian"
 SAMPLE_DATA = "sample"
 ALLOWED_DATA_CONFIGS = {TOY_DATA, IAN_DATA, SAMPLE_DATA}
 
-MC_DROPOUT = "mc_dropout"
-CONCRETE_DROPOUT = "concrete_dropout"
-DENSE = "dense"
-ALLOWED_NETWORK_CONFIGS = {MC_DROPOUT, CONCRETE_DROPOUT, DENSE}
-
 MSE = "mse"
 HETEROSCEDASTIC = "heteroscedastic"
 ALLOWED_LOSS_TYPES = {MSE, HETEROSCEDASTIC}
@@ -94,6 +89,7 @@ def plot_heteroscedastic(model, save, x_train, y_train, x_lim, y_lim):
         pred_mean, pred_var = model(x_test, training=True)
         preds_mean.append(pred_mean)
         preds_var.append(pred_var)
+
     plt.figure(figsize=(10, 4))
     preds_mean = np.array(preds_mean).reshape(20, n_test)
     preds_var = np.array(preds_var).reshape(20, n_test)
@@ -130,6 +126,7 @@ def plot_mse(model, save, x_train, y_train, x_lim, y_lim):
     for _ in range(n_repeats):
         pred = model(x_test, training=True)
         preds.append(pred)
+
     plt.figure(figsize=(10, 4))
     preds = np.array(preds).reshape(n_repeats, n_test)
     preds_mean = np.mean(preds, axis=0)
@@ -170,7 +167,6 @@ def heteroscedastic_loss(y_train, x_train, model):
 
 
 def fit_regression(loss_type="heteroscedastic", data="ian", additional_data=False, save=False):
-
     # load data
     if data not in ALLOWED_DATA_CONFIGS:
         raise AssertionError(f"'data' has to be in {ALLOWED_DATA_CONFIGS} but was set to {data}.")
